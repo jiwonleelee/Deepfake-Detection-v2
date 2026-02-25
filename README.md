@@ -26,7 +26,7 @@ The primary goal of this project is to overcome the **generalization gap** in de
 
 ## 📅 Roadmap (In Progress)
 
-- [x] Phase 1: Baseline setup with ConvNeXt-Tiny (Team Project baseline)
+- [x] Phase 1: Baseline setup with ConvNeXt-Tiny
 - [ ] Phase 2: Integration of SBI (Self-Blended Images) pipeline
 - [ ] Phase 3: Research-driven architectural modifications & Ablation studies
 - [ ] Phase 4: Implementation of Temporal Head (Transformer vs. GRU)
@@ -38,4 +38,3 @@ The primary goal of this project is to overcome the **generalization gap** in de
 * *Self-Blended Images for Generalizable Deepfake Detection (CVPR 2022)*
 * *A ConvNet for the 2020s (CVPR 2022)*
 * *M2TR: Multi-modal Multi-scale Transformers for Deepfake Detection (2022)*
-* *Video Vision Transformer (ViViT) (ICCV 2021)*

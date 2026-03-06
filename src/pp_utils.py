@@ -5,7 +5,7 @@ import json
 import urllib.request
 from tqdm import tqdm
 
-def get_aligned_face(image, face_info, target_size=(512, 512)):
+def get_aligned_face(image, face_info, target_size=(512, 512), margin_rate=1.0):
     try:
         h_img, w_img = image.shape[:2]
         landmarks = getattr(face_info, 'kps', None)
@@ -15,6 +15,7 @@ def get_aligned_face(image, face_info, target_size=(512, 512)):
         x1, y1, x2, y2 = bbox.astype(int)
         center_x, center_y = (x1 + x2) // 2, (y1 + y2) // 2
 
+        # 1. 정렬 로직 (기존과 동일)
         if landmarks is not None and len(landmarks) >= 2:
             left_eye, right_eye = landmarks[0], landmarks[1]
             dy, dx = right_eye[1] - left_eye[1], right_eye[0] - left_eye[0]
@@ -22,12 +23,16 @@ def get_aligned_face(image, face_info, target_size=(512, 512)):
             M = cv2.getRotationMatrix2D((float(center_x), float(center_y)), angle, 1.0)
             image = cv2.warpAffine(image, M, (w_img, h_img), flags=cv2.INTER_CUBIC)
 
+        # 2. 마진 계산 로직 (인수 기반 수정)
         w_box, h_box = x2 - x1, y2 - y1
-        side_length = int(max(w_box, h_box) * 2.0)
+        # (1.0 + margin_rate)를 통해 1.0일 때 2.0배, 0.125일 때 1.125배가 됩니다.
+        side_length = int(max(w_box, h_box) * (1.0 + margin_rate))
+        
         half_side = side_length // 2
         nx1, ny1 = center_x - half_side, center_y - half_side
         nx2, ny2 = center_x + half_side, center_y + half_side
 
+        # 3. 패딩 및 크롭 로직 (기존과 동일)
         pad_x1, pad_y1 = max(0, -nx1), max(0, -ny1)
         pad_x2, pad_y2 = max(0, nx2 - w_img), max(0, ny2 - h_img)
         nx1, ny1 = max(0, nx1), max(0, ny1)
@@ -37,6 +42,7 @@ def get_aligned_face(image, face_info, target_size=(512, 512)):
         if pad_x1 > 0 or pad_y1 > 0 or pad_x2 > 0 or pad_y2 > 0:
             face_crop = cv2.copyMakeBorder(face_crop, pad_y1, pad_y2, pad_x1, pad_x2,
                                            cv2.BORDER_CONSTANT, value=[0, 0, 0])
+                                           
         return cv2.resize(face_crop, target_size)
     except:
         return None
